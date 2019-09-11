@@ -65,4 +65,4 @@ Use [eslint-config-prettier-standard](https://github.com/npetruzzelli/eslint-con
 
 ## License
 
-[MIT](https://choosealicense.com/nnfans/kuisionerid_backend/)
+[MIT](https://github.com/nnfans/kuisionerid_backend/blob/master/LICENSE)
