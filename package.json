@@ -1,0 +1,61 @@
+{
+  "name": "kuisionerid_backend",
+  "version": "0.0.1",
+  "description": "",
+  "main": "app.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "tap src/**/*.test.js",
+    "start": "nodemon server.js"
+  },
+  "lint-staged": {
+    "**/*.js": [
+      "pretty-quick --staged",
+      "eslint --fix",
+      "git add"
+    ]
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": [
+        "lint-staged",
+        "npm test"
+      ],
+      "pre-push": [
+        "lint-staged",
+        "npm test"
+      ]
+    }
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "fastify": "^2.0.0",
+    "fastify-autoload": "^1.0.0",
+    "fastify-cli": "^1.1.0",
+    "fastify-helmet": "^3.0.1",
+    "fastify-plugin": "^1.5.0",
+    "fastify-redis": "^3.1.1",
+    "fastify-static": "^2.5.0"
+  },
+  "devDependencies": {
+    "eslint": "^6.3.0",
+    "eslint-config-prettier": "^6.2.0",
+    "eslint-config-prettier-standard": "^3.0.1",
+    "eslint-config-standard": "^14.1.0",
+    "eslint-plugin-import": "^2.18.2",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "husky": "^3.0.5",
+    "lint-staged": "^9.2.5",
+    "prettier": "^1.18.2",
+    "prettier-config-standard": "^1.0.1",
+    "pretty-quick": "^1.11.1",
+    "tap": "^12.5.3"
+  }
+}
