@@ -59,9 +59,10 @@ Use [eslint-config-prettier-standard](https://github.com/npetruzzelli/eslint-con
 #### Model
 
 - [ ] User
-- [ ] Checklist
-- [ ] Checklist Item
-- [ ] Checklist Template
+- [ ] Quiz
+- [ ] Quiz Template
+- [ ] Quiz Item
+- [ ] Quiz Item Template
 
 ## License
 

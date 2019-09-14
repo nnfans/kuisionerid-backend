@@ -28,12 +28,13 @@ module.exports = function(fastify, opts, next) {
     options: Object.assign({}, opts)
   })
 
-  // This loads all plugins defined in services
-  // define your routes in one of these
   fastify.register(AutoLoad, {
     dir: path.join(__dirname, 'services'),
-    options: Object.assign({}, opts)
+    options: Object.assign({}, opts),
+    ignorePattern: /.*(model|schema)\.js/
   })
+  // fastify.register(require('./services/quiz/get'))
+  // fastify.register(require('./services/quiz/post'))
 
   // Make sure to call next when done
   next()
