@@ -30,11 +30,8 @@ module.exports = function(fastify, opts, next) {
 
   fastify.register(AutoLoad, {
     dir: path.join(__dirname, 'services'),
-    options: Object.assign({}, opts),
-    ignorePattern: /.*(model|schema)\.js/
+    options: Object.assign({}, opts)
   })
-  // fastify.register(require('./services/quiz/get'))
-  // fastify.register(require('./services/quiz/post'))
 
   // Make sure to call next when done
   next()

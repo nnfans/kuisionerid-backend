@@ -18,3 +18,4 @@ const ChoicesItem = itemArray.discriminator(
 const ScaleItem = itemArray.discriminator('ScaleItem', schema.scaleItemSchema)
 
 module.exports = { Quiz, StatementItem, ChoicesItem, ScaleItem }
+module.exports.autoload = false

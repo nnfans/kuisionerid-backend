@@ -9,7 +9,9 @@ module.exports = function(fastify, opts, next) {
       query: {
         type: 'object',
         properties: {
-          sort: { type: 'string' }
+          sort: { type: 'string' },
+          'page[offset]': { type: 'number' },
+          'page[limit]': { type: 'number' }
         }
       },
       response: {

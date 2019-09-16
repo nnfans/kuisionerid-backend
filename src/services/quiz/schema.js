@@ -56,3 +56,5 @@ module.exports = {
   choicesItemSchema,
   scaleItemSchema
 }
+
+module.exports.autoload = false
