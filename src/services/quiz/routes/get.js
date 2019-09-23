@@ -1,6 +1,3 @@
-const schema = require('./schema')
-const model = require('./model')
-
 module.exports = function(fastify, opts, next) {
   fastify.route({
     url: '/public',
@@ -20,7 +17,7 @@ module.exports = function(fastify, opts, next) {
           properties: {
             data: {
               type: 'array',
-              items: schema.quizSchema.jsonSchema()
+              items: fastify.schema.quiz.jsonSchema()
             },
             meta: {
               type: 'object',
@@ -44,7 +41,7 @@ module.exports = function(fastify, opts, next) {
       }
     },
     handler: async function(req, rep) {
-      const publicQuiz = await model.Quiz.find().exec()
+      const publicQuiz = await fastify.model.Quiz.find()
 
       return {
         data: publicQuiz
@@ -54,5 +51,3 @@ module.exports = function(fastify, opts, next) {
 
   next()
 }
-
-module.exports.autoPrefix = '/quiz'

@@ -1,25 +1,46 @@
 const fp = require('fastify-plugin')
 const mongoose = require('mongoose')
 
-module.exports = fp(function(fastify, opts, next) {
-  const userPass =
-    process.env.DB_USER && process.env.DB_PASS
-      ? process.env.DB_USER + ':' + process.env.DB_PASS + '@'
-      : ''
-  const host = process.env.DB_HOST || 'localhost'
-  const port = process.env.DB_PORT || 27017
-  const database = process.env.DB_NAME
+module.exports = fp(async function(fastify, opts, next) {
+  let nextCalled = false
 
-  mongoose.connect(`mongodb://${userPass}${host}:${port}/${database}`, {
+  let uri
+
+  if (
+    typeof process.env.MONGODB_URI === 'string' &&
+    process.env.MONGODB_URI !== ''
+  ) {
+    uri = process.env.MONGODB_URI
+  } else {
+    const userPass =
+      process.env.MONGODB_USER && process.env.MONGODB_PASS
+        ? process.env.MONGODB_USER + ':' + process.env.MONGODB_PASS + '@'
+        : ''
+    const host = process.env.MONGODB_HOST || 'localhost'
+    const port = process.env.MONGODB_PORT || 27017
+    const database = process.env.MONGODB_NAME
+
+    uri = `mongodb://${userPass}${host}:${port}/${database}`
+  }
+
+  const conn = mongoose.createConnection(uri, {
     useUnifiedTopology: true,
     useNewUrlParser: true,
     autoIndex: false
   })
-  require('mongoose-schema-jsonschema')(mongoose)
 
-  mongoose.connection.on('error', function(err) {
-    fastify.log.info('Error database connection: ' + err)
+  require('mongoose-schema-jsonschema')(mongoose)
+  conn.on('error', function(err) {
+    fastify.log.error('(Mongoose) MongoDB: ' + err)
   })
 
-  next()
+  conn.on('connected', function() {
+    fastify.log.info('(Mongoose) MongoDB: Connected')
+    if (!nextCalled) {
+      nextCalled = true
+      next()
+    }
+  })
+
+  fastify.decorate('mongoose', conn)
 })

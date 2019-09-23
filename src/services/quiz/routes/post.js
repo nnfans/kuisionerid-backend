@@ -1,6 +1,3 @@
-const schema = require('./schema')
-const model = require('./model')
-
 module.exports = function(fastify, opts, next) {
   fastify.route({
     url: '/',
@@ -13,10 +10,11 @@ module.exports = function(fastify, opts, next) {
             type: 'object',
             properties: {
               type: { type: 'string' },
-              attributes: schema.quizSchema.jsonSchema()
+              attributes: fastify.schema.quiz.jsonSchema()
             }
           }
-        }
+        },
+        required: ['data']
       },
       response: {
         201: {
@@ -27,7 +25,7 @@ module.exports = function(fastify, opts, next) {
               properties: {
                 type: { type: 'string' },
                 id: { type: 'string' },
-                attributes: schema.quizSchema.jsonSchema()
+                attributes: fastify.schema.quiz.jsonSchema()
               }
             },
             links: {
@@ -41,7 +39,7 @@ module.exports = function(fastify, opts, next) {
       }
     },
     handler: async function(req, rep) {
-      const newQuiz = new model.Quiz(req.body.data.attributes)
+      const newQuiz = new fastify.model.Quiz(req.body.data.attributes)
 
       return {
         data: {
@@ -55,5 +53,3 @@ module.exports = function(fastify, opts, next) {
 
   next()
 }
-
-module.exports.autoPrefix = '/quiz'
