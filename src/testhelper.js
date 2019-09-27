@@ -4,7 +4,7 @@
 const Fastify = require('fastify')
 const fp = require('fastify-plugin')
 const App = require('./app')
-const { MongoMemoryServer } = require('mongodb-memory-server')
+const { MongoMemoryServer } = require('mongodb-memory-server-core')
 
 // Fill in this config with all the configurations
 // needed for testing the application
@@ -12,8 +12,8 @@ function config() {
   return {}
 }
 
-// automatically build and tear down our instance
-function build(t, instance, tearDown) {
+// automatically build instance
+function build(instance) {
   const app = Fastify()
 
   if (instance === undefined) {
@@ -24,14 +24,6 @@ function build(t, instance, tearDown) {
     // Load it
     app.register(fp(instance), config())
   }
-
-  // tear down our app after we are done
-  t.tearDown(async function() {
-    if (typeof tearDown === 'function') {
-      await tearDown()
-    }
-    await app.close()
-  })
 
   return app
 }

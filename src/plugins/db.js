@@ -30,6 +30,13 @@ module.exports = fp(async function(fastify, opts, next) {
   })
 
   require('mongoose-schema-jsonschema')(mongoose)
+  fastify.addHook('onClose', (instance, done) => {
+    instance.mongoose.on('close', function() {
+      done()
+    })
+    instance.mongoose.close()
+  })
+
   conn.on('error', function(err) {
     fastify.log.error('(Mongoose) MongoDB: ' + err)
   })

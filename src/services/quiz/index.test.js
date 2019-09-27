@@ -1,8 +1,9 @@
-const t = require('tap')
 const fp = require('fastify-plugin')
 const { build, loadMongoTestServer } = require('../../testhelper')
 const mongoose = require('mongoose')
 const fastJson = require('fast-json-stringify')
+let mongoserver
+let app
 
 // Prepare service as a fastify plugin
 // for test use
@@ -16,17 +17,21 @@ const service = function(fastify, opts, next) {
   next()
 }
 
-t.plan(1)
-t.test('Testing quiz endpoint', async t => {
+beforeAll(async () => {
   // Load & Run mongodb test server
-  const mongoserver = await loadMongoTestServer()
+  mongoserver = await loadMongoTestServer()
+  app = build(service)
 
-  const app = build(t, service, function() {
-    mongoserver.stop()
-  })
+  return app.ready()
+})
 
-  await app.ready()
+afterAll(async () => {
+  // Shutdown app instance and database server
+  await app.close()
+  mongoserver.stop()
+})
 
+test('/quiz endpoint', async function() {
   // Create new quiz
   const newQuiz = new app.model.Quiz({
     name: 'Test Quiz',
@@ -83,26 +88,20 @@ t.test('Testing quiz endpoint', async t => {
     }
   })
 
-  t.plan(1)
-
-  t.test('GET: /quiz/public endpoint', async t => {
-    const res = await app.inject({
-      method: 'GET',
-      url: '/quiz/public'
-    })
-
-    t.plan(3)
-
-    t.strictEqual(res.statusCode, 200)
-    t.strictEqual(
-      res.headers['content-type'],
-      'application/json; charset=utf-8'
-    )
-    t.deepEqual(
-      res.payload,
-      stringifyQuiz({
-        data: [newQuiz]
-      })
-    )
+  const res = await app.inject({
+    method: 'GET',
+    url: '/quiz/public'
   })
+
+  const expectStatusCode = expect(res.statusCode).toBe(200)
+  const expectContentType = expect(res.headers['content-type']).toBe(
+    'application/json; charset=utf-8'
+  )
+  const expectPayload = expect(res.payload).toEqual(
+    stringifyQuiz({
+      data: [newQuiz]
+    })
+  )
+
+  return Promise.all([expectStatusCode, expectContentType, expectPayload])
 })

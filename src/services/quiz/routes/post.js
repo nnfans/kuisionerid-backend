@@ -8,10 +8,7 @@ module.exports = function(fastify, opts, next) {
         properties: {
           data: {
             type: 'object',
-            properties: {
-              type: { type: 'string' },
-              attributes: fastify.schema.quiz.jsonSchema()
-            }
+            attributes: fastify.schema.quiz.jsonSchema()
           }
         },
         required: ['data']
@@ -40,6 +37,8 @@ module.exports = function(fastify, opts, next) {
     },
     handler: async function(req, rep) {
       const newQuiz = new fastify.model.Quiz(req.body.data.attributes)
+
+      await newQuiz.save()
 
       return {
         data: {

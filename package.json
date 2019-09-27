@@ -7,7 +7,7 @@
     "test": "test"
   },
   "scripts": {
-    "test": "tap src/**/*.test.js",
+    "test": "jest",
     "start": "fastify start -l info src/app.js",
     "dev": "fastify start -l info -P src/app.js"
   },
@@ -20,14 +20,8 @@
   },
   "husky": {
     "hooks": {
-      "pre-commit": [
-        "lint-staged",
-        "yarn test"
-      ],
-      "pre-push": [
-        "lint-staged",
-        "yarn test"
-      ]
+      "pre-commit": "lint-staged && yarn test",
+      "pre-push": "lint-staged && yarn test"
     }
   },
   "keywords": [],
@@ -58,8 +52,9 @@
     "eslint-plugin-standard": "^4.0.1",
     "faker": "^4.1.0",
     "husky": "^3.0.5",
+    "jest": "^24.9.0",
     "lint-staged": "^9.2.5",
-    "mongodb-memory-server": "^5.2.3",
+    "mongodb-memory-server-core": "^5.2.5",
     "prettier": "^1.18.2",
     "prettier-config-standard": "^1.0.1",
     "pretty-quick": "^1.11.1",
