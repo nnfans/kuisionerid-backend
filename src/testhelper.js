@@ -4,7 +4,6 @@
 const Fastify = require('fastify')
 const fp = require('fastify-plugin')
 const App = require('./app')
-const { MongoMemoryServer } = require('mongodb-memory-server-core')
 
 // Fill in this config with all the configurations
 // needed for testing the application
@@ -28,18 +27,7 @@ function build(instance) {
   return app
 }
 
-// run mongodb test server and
-// replace the environment
-async function loadMongoTestServer() {
-  const mongod = new MongoMemoryServer()
-
-  const uri = await mongod.getConnectionString()
-  process.env.MONGODB_URI = uri
-  return mongod
-}
-
 module.exports = {
   config,
-  build,
-  loadMongoTestServer
+  build
 }

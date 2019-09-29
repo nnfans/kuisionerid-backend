@@ -1,8 +1,7 @@
 const fp = require('fastify-plugin')
-const { build, loadMongoTestServer } = require('../../testhelper')
+const { build } = require('../../testhelper')
 const mongoose = require('mongoose')
 const fastJson = require('fast-json-stringify')
-let mongoserver
 let app
 
 // Prepare service as a fastify plugin
@@ -18,17 +17,16 @@ const service = function(fastify, opts, next) {
 }
 
 beforeAll(async () => {
-  // Load & Run mongodb test server
-  mongoserver = await loadMongoTestServer()
+  // add __MONGO_URI__ to process.env.MONGODB_URI
+  process.env.MONGODB_URI = global.__MONGO_URI__
   app = build(service)
 
   return app.ready()
 })
 
 afterAll(async () => {
-  // Shutdown app instance and database server
+  // Shutdown app instance
   await app.close()
-  mongoserver.stop()
 })
 
 test('/quiz endpoint', async function() {

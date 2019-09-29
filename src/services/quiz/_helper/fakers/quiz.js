@@ -25,8 +25,12 @@ const gUnique = function(generator) {
 }
 
 const quizFaker = function(nData) {
-  if (typeof nData !== 'number' || nData < 1) {
+  if (typeof nData !== 'number') {
     nData = 1
+  }
+
+  if (nData < 1) {
+    throw new Error('quizFaker 1st argument: nData must be 1 or more')
   }
 
   const uniqueUsername = gUnique(faker.internet.userName)
