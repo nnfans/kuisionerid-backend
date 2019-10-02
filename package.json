@@ -42,6 +42,7 @@
   },
   "devDependencies": {
     "@shelf/jest-mongodb": "^1.1.1",
+    "ajv": "^6.10.2",
     "eslint": "^6.3.0",
     "eslint-config-prettier": "^6.2.0",
     "eslint-config-prettier-standard": "^3.0.1",

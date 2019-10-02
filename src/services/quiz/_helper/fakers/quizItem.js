@@ -40,8 +40,8 @@ const quizItemFaker = function(nData, options) {
 
   let quizItems = Array.apply(null, Array(nData))
 
-  let dateTime = ''
-  let kind = ''
+  let dateTime
+  let kind
 
   if (typeof onlyKind === 'string' && quizItemKind.includes(onlyKind)) {
     isOnlyKind = true
@@ -71,5 +71,3 @@ const quizItemFaker = function(nData, options) {
 }
 
 module.exports = quizItemFaker
-
-console.dir(quizItemFaker(15))

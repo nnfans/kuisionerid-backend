@@ -53,8 +53,8 @@ Use [eslint-config-prettier-standard](https://github.com/npetruzzelli/eslint-con
 
 #### End-point
 
-- [ ] User (/users)
-- [ ] Checklist (/checklists)
+- [ ] User (/user)
+- [ ] Quiz (/quiz)
 
 #### Model
 

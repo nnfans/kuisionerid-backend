@@ -1,7 +1,8 @@
 const fp = require('fastify-plugin')
 const { build } = require('../../testhelper')
-const mongoose = require('mongoose')
 const fastJson = require('fast-json-stringify')
+const quizFaker = require('./_helper/fakers/quiz')
+
 let app
 
 // Prepare service as a fastify plugin
@@ -31,31 +32,7 @@ afterAll(async () => {
 
 test('/quiz endpoint', async function() {
   // Create new quiz
-  const newQuiz = new app.model.Quiz({
-    name: 'Test Quiz',
-    items: [
-      {
-        kind: 'Statement',
-        title: 'First statement',
-        description: 'First statement description'
-      },
-      {
-        kind: 'Statement',
-        title: 'Second statement',
-        description: 'Second statement description'
-      },
-      {
-        kind: 'Statement',
-        title: 'Third statement',
-        description: 'Third statement description'
-      }
-    ],
-    isTemplate: false,
-    isPublic: true,
-    isDraft: false,
-    createdBy: mongoose.Types.ObjectId(),
-    updatedBy: mongoose.Types.ObjectId()
-  })
+  const newQuiz = new app.model.Quiz(quizFaker(1))
 
   await newQuiz.save()
 
