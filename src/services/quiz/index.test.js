@@ -17,7 +17,7 @@ const service = function(fastify, opts, next) {
   next()
 }
 
-beforeAll(async () => {
+beforeAll(async function() {
   // add __MONGO_URI__ to process.env.MONGODB_URI
   process.env.MONGODB_URI = global.__MONGO_URI__
   app = build(service)
@@ -25,7 +25,7 @@ beforeAll(async () => {
   return app.ready()
 })
 
-afterAll(async () => {
+afterAll(async function() {
   // Shutdown app instance
   await app.close()
 })
@@ -65,7 +65,7 @@ test('/quiz endpoint', async function() {
 
   const res = await app.inject({
     method: 'GET',
-    url: '/quiz/public'
+    url: '/quiz'
   })
 
   const expectStatusCode = expect(res.statusCode).toBe(200)

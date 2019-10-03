@@ -1,6 +1,6 @@
 module.exports = function(fastify, opts, next) {
   fastify.route({
-    url: '/public',
+    url: '/',
     method: 'GET',
     schema: {
       query: {
