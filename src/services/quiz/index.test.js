@@ -60,7 +60,8 @@ test('/quiz endpoint', async function() {
           next: { type: 'string' }
         }
       }
-    }
+    },
+    required: ['data', 'meta', 'links']
   })
 
   const res = await app.inject({
@@ -74,7 +75,9 @@ test('/quiz endpoint', async function() {
   )
   const expectPayload = expect(res.payload).toEqual(
     stringifyQuiz({
-      data: [newQuiz]
+      data: [newQuiz],
+      meta: {},
+      links: {}
     })
   )
 

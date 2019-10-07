@@ -44,7 +44,9 @@ module.exports = function(fastify, opts, next) {
       const publicQuiz = await fastify.model.Quiz.find()
 
       return {
-        data: publicQuiz
+        data: publicQuiz,
+        meta: {},
+        links: {}
       }
     }
   })

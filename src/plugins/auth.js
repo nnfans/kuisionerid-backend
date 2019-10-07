@@ -42,12 +42,8 @@ module.exports = fp(function(fastify, opts, next) {
     )
   }
 
-  /** Return bearer token for identity after success login */
-  async function setTokenAs(request, reply) {}
-
   fastify.decorate('userFromJWT', userFromJWT)
   fastify.decorate('extendUserInfo', extendUserInfo)
-  fastify.decorate('setTokenAs', setTokenAs)
 
   fastify.register(require('./auth/routes'))
 
