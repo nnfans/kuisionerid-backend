@@ -1,6 +1,7 @@
 require('dotenv').config()
 
 const { build } = require('../testhelper')
+const bcrypt = require('bcryptjs')
 
 let app
 
@@ -24,7 +25,9 @@ beforeAll(async function() {
   process.env.MONGODB_URI = global.__MONGO_URI__
   app = build(service)
 
-  return app.ready()
+  await app.ready()
+
+  return app.model.User.createIndexes()
 })
 
 afterAll(async function() {
@@ -32,7 +35,12 @@ afterAll(async function() {
   await app.close()
 })
 
-describe('Register without required field should error should be (402)', function() {
+beforeEach(async function() {
+  // Reset database
+  await app.model.User.collection.deleteMany({})
+})
+
+describe('Register without required field should error (400: Bad Request)', function() {
   test('Register without fullname only', async function() {
     const res = await app.inject({
       method: 'POST',
@@ -44,5 +52,61 @@ describe('Register without required field should error should be (402)', functio
     })
 
     expect(res.statusCode).toBe(400)
+  })
+
+  test('Register without username only', async function() {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/register',
+      payload: {
+        fullname: 'Ali Budianto',
+        password: 'Ali123'
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
+  })
+
+  test('Register without password only', async function() {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/register',
+      payload: {
+        fullname: 'Ali Budianto',
+        username: 'ali'
+      }
+    })
+
+    expect(res.statusCode).toBe(400)
+  })
+})
+
+describe('Register with duplicate unique field (409: Conflict)', function() {
+  beforeEach(async function() {
+    const newUser = new app.model.User({
+      fullname: 'Ali Budianto',
+      username: 'ali',
+      password: await bcrypt.hash('ali123', 10)
+    })
+
+    return newUser.save()
+  })
+
+  afterEach(async function() {
+    await app.model.User.collection.deleteMany({})
+  })
+
+  test('Register with duplicate username', async function() {
+    const res = await app.inject({
+      method: 'POST',
+      url: '/register',
+      payload: {
+        fullname: 'Ali Budianto',
+        username: 'ali',
+        password: 'ali123'
+      }
+    })
+
+    expect(res.statusCode).toBe(409)
   })
 })

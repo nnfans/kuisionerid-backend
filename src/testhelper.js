@@ -13,7 +13,7 @@ function config() {
 
 // automatically build instance
 function build(instance) {
-  const app = Fastify()
+  const app = Fastify({ logger: { level: 'warn' } })
 
   if (instance === undefined) {
     // Default app.js instance

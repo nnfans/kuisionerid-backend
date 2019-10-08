@@ -20,18 +20,26 @@ module.exports = fp(function(fastify, opts, next) {
         200: {
           type: 'object',
           properties: {
-            data: fastify.schema.user.jsonSchema(),
+            data: {
+              type: 'object',
+              properties: {
+                fullname: { type: 'string' },
+                username: { type: 'string' },
+                createdAt: { type: 'string' }
+              }
+            },
             token: { type: 'string' }
           }
         }
       }
     },
     handler: async function(req, rep) {
-      req.body.password = await bcrypt.hash(req.body.password, 10)
       const newUser = this.model.User(req.body)
 
+      if (newUser.isDuplicate) {
+        throw fastify.httpErrors.conflict()
+      }
       await newUser.save()
-
       const resultData = newUser.getPublicFields()
 
       const token = fastify.jwt.sign({

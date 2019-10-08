@@ -4,13 +4,20 @@ module.exports = fp(function(fastify, opts, next) {
   const mongoose = fastify.mongoose
   const Schema = mongoose.base.Schema
 
-  fastify.schema.user = new Schema({
-    fullname: String,
+  const userSchema = new Schema({
+    fullname: {
+      type: String,
+      required: true
+    },
     username: {
       type: String,
-      unique: true
+      unique: true,
+      index: true
     },
-    password: String,
+    password: {
+      type: String,
+      required: true
+    },
     changes: [Schema.Types.Mixed],
     createdAt: {
       type: Date,
@@ -18,7 +25,7 @@ module.exports = fp(function(fastify, opts, next) {
     }
   })
 
-  fastify.schema.user.methods.getPublicFields = function() {
+  userSchema.methods.getPublicFields = function() {
     const returnObject = {
       fullname: this.fullname,
       username: this.username,
@@ -26,6 +33,15 @@ module.exports = fp(function(fastify, opts, next) {
     }
     return returnObject
   }
+
+  userSchema.methods.isDuplicate = function() {
+    const foundDuplicate = this.model('User').findOne({
+      username: this.username
+    })
+    return !!foundDuplicate
+  }
+
+  fastify.schema.user = userSchema
 
   next()
 })
