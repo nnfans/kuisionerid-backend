@@ -36,10 +36,17 @@ module.exports = fp(function(fastify, opts, next) {
     handler: async function(req, rep) {
       const newUser = this.model.User(req.body)
 
-      if (newUser.isDuplicate) {
+      // Check if any of unique user field is duplicate
+      if (await newUser.isDuplicate()) {
         throw fastify.httpErrors.conflict()
       }
+
+      // Save collection to db
       await newUser.save()
+
+      // Set HTTP Response code to 201: Created
+      rep.code(201)
+
       const resultData = newUser.getPublicFields()
 
       const token = fastify.jwt.sign({

@@ -34,10 +34,15 @@ module.exports = fp(function(fastify, opts, next) {
     return returnObject
   }
 
-  userSchema.methods.isDuplicate = function() {
-    const foundDuplicate = this.model('User').findOne({
-      username: this.username
-    })
+  userSchema.methods.isDuplicate = async function() {
+    const foundDuplicate = await this.model('User')
+      .findOne(
+        {
+          username: this.username
+        },
+        '_id'
+      )
+      .lean(true)
     return !!foundDuplicate
   }
 

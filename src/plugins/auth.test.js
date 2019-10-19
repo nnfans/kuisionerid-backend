@@ -1,6 +1,6 @@
 require('dotenv').config()
 
-const { build } = require('../testhelper')
+const { build, possibleUncompletedCombination } = require('../testhelper')
 const bcrypt = require('bcryptjs')
 
 let app
@@ -30,58 +30,45 @@ beforeAll(async function() {
   return app.model.User.createIndexes()
 })
 
-afterAll(async function() {
+afterAll(function() {
   // Shutdown app instance
-  await app.close()
+  return app.close()
 })
 
-beforeEach(async function() {
-  // Reset database
-  await app.model.User.collection.deleteMany({})
+// Test /register endpoint without required field
+describe('Register without required field', function() {
+  const uncompletedNewUsers = possibleUncompletedCombination({
+    fullname: 'Ali Budianto',
+    username: 'Ali',
+    password: 'Ali123'
+  })
+
+  // Clear user collections before starting the test
+  beforeAll(function() {
+    return app.model.User.collection.deleteMany({})
+  })
+
+  // Test each possible combination without required field
+  test.each(uncompletedNewUsers)(
+    'Return should be error (409: Bad Request) ',
+    async function(newUser) {
+      const res = await app.inject({
+        method: 'POST',
+        url: '/register',
+        payload: newUser
+      })
+
+      expect(res.statusCode).toBe(400)
+      expect(res.headers['content-type']).toBe(
+        'application/json; charset=utf-8'
+      )
+    }
+  )
 })
 
-describe('Register without required field should error (400: Bad Request)', function() {
-  test('Register without fullname only', async function() {
-    const res = await app.inject({
-      method: 'POST',
-      url: '/register',
-      payload: {
-        username: 'Ali',
-        password: 'Ali123'
-      }
-    })
-
-    expect(res.statusCode).toBe(400)
-  })
-
-  test('Register without username only', async function() {
-    const res = await app.inject({
-      method: 'POST',
-      url: '/register',
-      payload: {
-        fullname: 'Ali Budianto',
-        password: 'Ali123'
-      }
-    })
-
-    expect(res.statusCode).toBe(400)
-  })
-
-  test('Register without password only', async function() {
-    const res = await app.inject({
-      method: 'POST',
-      url: '/register',
-      payload: {
-        fullname: 'Ali Budianto',
-        username: 'ali'
-      }
-    })
-
-    expect(res.statusCode).toBe(400)
-  })
-})
-
+// Test /register endpoint to duplicate unique field
 describe('Register with duplicate unique field (409: Conflict)', function() {
+  // Create new user before each test
   beforeEach(async function() {
     const newUser = new app.model.User({
       fullname: 'Ali Budianto',
@@ -92,21 +79,62 @@ describe('Register with duplicate unique field (409: Conflict)', function() {
     return newUser.save()
   })
 
+  // Clear user collection after each test
   afterEach(async function() {
-    await app.model.User.collection.deleteMany({})
+    return app.model.User.collection.deleteMany({})
   })
 
+  // Register with duplicate username field
   test('Register with duplicate username', async function() {
     const res = await app.inject({
       method: 'POST',
       url: '/register',
       payload: {
-        fullname: 'Ali Budianto',
+        fullname: 'Ali Susanto',
         username: 'ali',
-        password: 'ali123'
+        password: 'all1n0n3'
       }
     })
 
     expect(res.statusCode).toBe(409)
+    expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
+  })
+})
+
+// Register via /register endpoint with proper fields
+describe('Register new user with success', function() {
+  // Clear user collections before tests
+  beforeAll(async function() {
+    return app.model.User.collection.deleteMany({})
+  })
+
+  // Register with sample user data
+  test('/register endpoint to create user', async function() {
+    const newUser = {
+      fullname: 'Ali Budianto',
+      username: 'ali',
+      password: '321ila'
+    }
+
+    const res = await app.inject({
+      method: 'POST',
+      url: '/register',
+      payload: newUser
+    })
+
+    expect(res.statusCode).toBe(201)
+    expect(res.headers['content-type']).toBe('application/json; charset=utf-8')
+
+    // Get user by fullname and username field in db
+    const user = await app.model.User.findOne(
+      {
+        fullname: newUser.fullname,
+        username: newUser.username
+      },
+      'fullname username'
+    ).lean(true)
+
+    // New user should be exists
+    expect(!!user).toBe(true)
   })
 })
