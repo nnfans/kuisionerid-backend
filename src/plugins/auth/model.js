@@ -50,7 +50,5 @@ module.exports = fp(function(fastify, opts, next) {
 
   fastify.model.User = User
 
-  console.log(fastify.model.User.schema.jsonSchema())
-
   next()
 })

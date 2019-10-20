@@ -2,6 +2,13 @@ const fp = require('fastify-plugin')
 const bcrypt = require('bcryptjs')
 
 module.exports = fp(function(fastify, opts, next) {
+  const registerHandler = require('./register')({
+    User: fastify.model.User,
+    httpErrors: fastify.httpErrors,
+    jwt: fastify.jwt
+  })
+  const loginHandler = require('./login')({ bcrypt })
+
   /** Register route */
   fastify.route({
     url: '/register',
@@ -33,33 +40,7 @@ module.exports = fp(function(fastify, opts, next) {
         }
       }
     },
-    handler: async function(req, rep) {
-      const newUser = this.model.User(req.body)
-
-      // Check if any of unique user field is duplicate
-      if (await newUser.isDuplicate()) {
-        throw fastify.httpErrors.conflict()
-      }
-
-      // Save collection to db
-      await newUser.save()
-
-      // Set HTTP Response code to 201: Created
-      rep.code(201)
-
-      const resultData = newUser.getPublicFields()
-
-      const token = fastify.jwt.sign({
-        user: {
-          username: req.body.username
-        }
-      })
-
-      return {
-        data: resultData,
-        token
-      }
-    }
+    handler: registerHandler.post
   })
 
   /** Login route */
@@ -93,37 +74,7 @@ module.exports = fp(function(fastify, opts, next) {
         }
       }
     },
-    handler: async function(req, rep) {
-      const foundUser = await this.model.User.findOne(
-        {
-          username: req.body.username
-        },
-        'username password'
-      )
-
-      let isValid = false
-      if (foundUser) {
-        // Check if user password is match
-        isValid = await bcrypt.compare(req.body.password, foundUser.password)
-      }
-
-      if (isValid) {
-        const resultData = foundUser.getPublicFields()
-
-        const token = fastify.jwt.sign({
-          user: {
-            username: req.body.username
-          }
-        })
-
-        return {
-          data: resultData,
-          token
-        }
-      } else {
-        rep.unauthorized('Username and password not match')
-      }
-    }
+    handler: loginHandler.post
   })
 
   next()
