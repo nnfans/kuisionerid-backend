@@ -3,14 +3,10 @@ const { BadRequest } = require('http-errors')
 
 module.exports = fp(function(fastify, opts, next) {
   /** Prepare an empty objects into instance */
-  if (fastify.schema === undefined) {
-    fastify.decorate('schema', {})
-  }
   if (fastify.model === undefined) {
     fastify.decorate('model', {})
   }
 
-  fastify.register(require('./auth/schema'))
   fastify.register(require('./auth/model'))
 
   /** Verify JWT & Add request.user variable */

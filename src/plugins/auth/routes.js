@@ -79,7 +79,7 @@ module.exports = fp(function(fastify, opts, next) {
         200: {
           type: 'object',
           properties: {
-            data: fastify.schema.user.jsonSchema(),
+            data: fastify.model.User.schema.jsonSchema(),
             token: { type: 'string' }
           }
         },
